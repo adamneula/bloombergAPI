@@ -23,6 +23,22 @@ double getPrice(std::string ticker) {
     }
 
     std::cout << "Connected to bloomberg successfully" << std::endl;
+
+    if (!session.openService("//blp/refdata")) {
+        std::cerr << "Failed to open //blp/refdata service" << std::endl;
+        session.stop();
+        wait(5);
+        return -1;
+    }
+
+    Service refDataService = session.getService("//blp/refdata");
+    std::cout << "Reference Data Service has been successfully opened!" << std::endl;
+
+    Request request = refDataService.createRequest("ReferenceDataRequest");
+    request.append("securities", ticker.c_str());
+    request.append("fields", "PX_LAST");
+    std::cout << "Request form build cleanly for ticker: " << ticker << std::endl;
+    
     wait(5);
     return 0.0;
 }
