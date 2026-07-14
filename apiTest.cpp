@@ -64,12 +64,16 @@ double getPrice(std::string ticker) {
     }
 
     session.stop();
-    wait(5);
     return 0.0;
 }
 
 int main() {
-    std::cout << "Here is the most recent price of AAPL: " << getPrice(std::string("AAPL US EQUITY")) << std::endl;
-    wait(20);
+    while(true) {
+        std::string ticker;
+        std::cout << "Enter your ticker (US): ";
+        std::cin >> ticker;
+        ticker += " US EQUITY";
+        std::cout << getPrice(ticker) << std::endl;
+    }
     return 0;
 }
