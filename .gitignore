@@ -1,0 +1,10 @@
+# Ignore compiled binaries and linker files
+*.exe
+*.obj
+*.pdb
+*.ilk
+*.lib
+*.dll
+
+# (Optional) Ignore downloaded zip files or local scratch data
+*.zip

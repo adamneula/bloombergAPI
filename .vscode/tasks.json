@@ -1,0 +1,45 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "type": "shell",
+            "label": "Compile with MSVC (Auto vcvars64)",
+            "command": "${workspaceFolder}\\.vscode\\msvc_build.bat",
+            "args": [
+                "${file}"
+            ],
+            "options": {
+                "cwd": "${fileDirname}",
+                "shell": {
+                    "executable": "cmd.exe",
+                    "args": ["/d", "/c"]
+                }
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "detail": "Compiles active file cleanly using msvc_build.bat"
+        },
+        {
+            "type": "shell",
+            "label": "Compile & Run with MSVC",
+            "command": "${workspaceFolder}\\.vscode\\msvc_build.bat \"${file}\" && \"${fileDirname}\\${fileBasenameNoExtension}.exe\"",
+            "options": {
+                "cwd": "${fileDirname}",
+                "shell": {
+                    "executable": "cmd.exe",
+                    "args": ["/d", "/c"]
+                }
+            },
+            "problemMatcher": [
+                "$msCompile"
+            ],
+            "group": "build",
+            "detail": "Compiles the active C++ file and immediately executes it so you can view the output"
+        }
+    ]
+}
