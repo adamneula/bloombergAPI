@@ -3,13 +3,13 @@
 #include <chrono>
 #include <thread>
 
-using namespace BloombergLP::blpapi;
+using namespace BloombergLP::blpapi; using namespace std;
 
 void wait(int time) {
-    std::this_thread::sleep_for(std::chrono::seconds(time));
+    this_thread::sleep_for(chrono::seconds(time));
 }
 
-double getPrice(std::string ticker) {
+double getPrice(string ticker) {
     SessionOptions options;
 //Connect to bloomberg on machine
     options.setServerHost("localhost");
@@ -17,15 +17,15 @@ double getPrice(std::string ticker) {
     Session session(options);
 
     if (!session.start()) {
-        std::cerr << "Failed to connect! Check terminal connection." << std::endl;
+        cerr << "Failed to connect! Check terminal connection." << endl;
         wait(5);
         return -1.0;
     }
 
-    std::cout << "Connected to bloomberg successfully" << std::endl;
+    cout << "Connected to bloomberg successfully" << endl;
 
     if (!session.openService("//blp/refdata")) {
-        std::cerr << "Failed to open //blp/refdata service" << std::endl;
+        cerr << "Failed to open //blp/refdata service" << endl;
         session.stop();
         wait(5);
         return -1;
@@ -33,13 +33,13 @@ double getPrice(std::string ticker) {
 
     //Retrieve reference data
     Service refDataService = session.getService("//blp/refdata");
-    std::cout << "Reference Data Service has been successfully opened!" << std::endl;
+    cout << "Reference Data Service has been successfully opened!" << endl;
 
     //Build request in abstract data type
     Request request = refDataService.createRequest("ReferenceDataRequest");
     request.append("securities", ticker.c_str());
     request.append("fields", "PX_LAST");
-    std::cout << "Request form build cleanly for ticker: " << ticker << std::endl;
+    cout << "Request form build cleanly for ticker: " << ticker << endl;
 
     //Send request
     session.sendRequest(request);
@@ -55,7 +55,7 @@ double getPrice(std::string ticker) {
             MessageIterator msgIter(event);
             while (msgIter.next()) {
                 Message msg = msgIter.message();
-                msg.print(std::cout);
+                msg.print(cout);
             }
         }
         if (event.eventType() == Event::RESPONSE) {
@@ -69,11 +69,11 @@ double getPrice(std::string ticker) {
 
 int main() {
     while(true) {
-        std::string ticker;
-        std::cout << "Enter your ticker (US): ";
-        std::cin >> ticker;
+        string ticker;
+        cout << "Enter your ticker (US): ";
+        cin >> ticker;
         ticker += " US EQUITY";
-        std::cout << getPrice(ticker) << std::endl;
+        cout << getPrice(ticker) << endl;
     }
     return 0;
 }

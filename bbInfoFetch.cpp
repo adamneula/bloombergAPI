@@ -5,7 +5,7 @@
 #include <vector>
 #include <map>
 
-using namespace std;
+using namespace std; using namespace BloombergLP::blpapi;
 
 struct DailyRecord {
     string ticker; //ticker
@@ -13,16 +13,15 @@ struct DailyRecord {
     map<string, double> metrics; //dictionary to store bloomberg's raw response
 };
 
-
-using namespace BloombergLP::blpapi;
-
 void wait(int time) {
-    std::this_thread::sleep_for(std::chrono::seconds(time));
+    this_thread::sleep_for(chrono::seconds(time));
 }
 
-//TODO: make this take in a vector of tickers and return a 3d array of tickers->dates->price/eps/yield/etc
-std::vector<DailyRecord> bbInfoFetch(std::string ticker) {
-    std::vector<DailyRecord> resultsTable;
+vector<DailyRecord> bbInfoFetch(const vector<string>& tickers,
+                                const vector<string>& fields,
+                                const string& startDate,
+                                const string& endDate) {
+    vector<DailyRecord> resultsTable;
     
     SessionOptions options;
 //Connect to bloomberg on machine
@@ -31,15 +30,15 @@ std::vector<DailyRecord> bbInfoFetch(std::string ticker) {
     Session session(options);
 
     if (!session.start()) {
-        std::cerr << "Failed to connect! Check terminal connection." << std::endl;
+        cerr << "Failed to connect! Check terminal connection." << endl;
         wait(5);
         return resultsTable;
     }
 
-    std::cout << "Connected to bloomberg successfully" << std::endl;
+    cout << "Connected to bloomberg successfully" << endl;
 
     if (!session.openService("//blp/refdata")) {
-        std::cerr << "Failed to open //blp/refdata service" << std::endl;
+        cerr << "Failed to open //blp/refdata service" << endl;
         session.stop();
         wait(5);
         return resultsTable;
@@ -47,13 +46,13 @@ std::vector<DailyRecord> bbInfoFetch(std::string ticker) {
 
     //Retrieve reference data
     Service refDataService = session.getService("//blp/refdata");
-    std::cout << "Reference Data Service has been successfully opened!" << std::endl;
+    cout << "Reference Data Service has been successfully opened!" << endl;
 
     //Build request in abstract data type
     Request request = refDataService.createRequest("ReferenceDataRequest");
     request.append("securities", ticker.c_str());
     request.append("fields", "PX_LAST");
-    std::cout << "Request form build cleanly for ticker: " << ticker << std::endl;
+    cout << "Request form build cleanly for ticker: " << ticker << endl;
 
     //Send request
     session.sendRequest(request);
@@ -69,7 +68,7 @@ std::vector<DailyRecord> bbInfoFetch(std::string ticker) {
             MessageIterator msgIter(event);
             while (msgIter.next()) {
                 Message msg = msgIter.message();
-                msg.print(std::cout);
+                msg.print(cout);
             }
         }
         if (event.eventType() == Event::RESPONSE) {
@@ -83,12 +82,12 @@ std::vector<DailyRecord> bbInfoFetch(std::string ticker) {
 
 int main() {
     while(true) {
-        std::string ticker;
-        std::cout << "Enter your ticker (US): ";
-        std::cin >> ticker;
+        string ticker;
+        cout << "Enter your ticker (US): ";
+        cin >> ticker;
         ticker += " US EQUITY";
         auto myTable = bbInfoFetch(ticker);
-        std::cout << "Fetch finished! Total rows received: " << std::endl;
+        cout << "Fetch finished! Total rows received: " << endl;
     }
     return 0;
 }
