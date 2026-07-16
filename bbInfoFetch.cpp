@@ -49,10 +49,12 @@ vector<DailyRecord> bbInfoFetch(const vector<string>& tickers,
     cout << "Reference Data Service has been successfully opened!" << endl;
 
     //Build request in abstract data type
-    Request request = refDataService.createRequest("ReferenceDataRequest");
-    request.append("securities", ticker.c_str());
-    request.append("fields", "PX_LAST");
-    cout << "Request form build cleanly for ticker: " << ticker << endl;
+    Request request = refDataService.createRequest("HistoricalDataRequest");
+    for (const auto& t: tickers) {request.append("securities", t.c_str());}
+    for (const auto& f: fields) {request.append("fields", f.c_str());}
+    request.set("startDate", startDate.c_str());
+    request.set("endDate", endDate.c_str());
+    cout << "Request form build cleanly for tickers: " << tickers.size() << endl;
 
     //Send request
     session.sendRequest(request);
@@ -81,13 +83,17 @@ vector<DailyRecord> bbInfoFetch(const vector<string>& tickers,
 }
 
 int main() {
-    while(true) {
-        string ticker;
-        cout << "Enter your ticker (US): ";
-        cin >> ticker;
-        ticker += " US EQUITY";
-        auto myTable = bbInfoFetch(ticker);
-        cout << "Fetch finished! Total rows received: " << endl;
-    }
+    // 1. Create our array of stocks:
+    vector<string> myStocks = { "AAPL US Equity", "MSFT US Equity" };
+    // 2. Create our array of metrics:
+    vector<string> myMetrics = { "PX_LAST", "PE_RATIO" };
+    // 3. Create our date horizon:
+    string start = "20260101";
+    string end   = "20260714";
+    // 4. Call our upgraded bbInfoFetch with all 4 arguments!
+    auto myTable = bbInfoFetch(myStocks, myMetrics, start, end);
+    
+    cout << "Fetch finished! Total rows received: " << myTable.size() << endl;
+    wait(60);
     return 0;
 }
